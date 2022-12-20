@@ -81,7 +81,8 @@ const propertyDetailsSchema = new mongoose.Schema({
     },
     Electricity:{
         type:String,
-        required:true
+        required:true,
+        unique:true
     }, 
     Facing:{
         type:String,
@@ -93,6 +94,7 @@ const propertyDetailsSchema = new mongoose.Schema({
     },
     Mobile:{
         type:Number,
+        min: 10,
         required:true
     },
     Posted_by:{
@@ -112,14 +114,16 @@ const propertyDetailsSchema = new mongoose.Schema({
         required:true
     },
     images:{
-        type:String
+        type:String,
+        required:true
     },
     cloudinary_id:{
         type: String
     },
     Email:{
         type:String,
-        required:true
+        required:true,
+        unique:true
     },
     City:{
         type:String,
