@@ -2,7 +2,7 @@ const router = require("express").Router();
 const propertySchema = require("../models/propertySchema");
 
 router.get("/allproperties", (req, res) => {
-  Pschema.find()
+  propertySchema.find()
     .populate("postedBy", "name")
     .then((properties) => {
       res.json({ properties });
