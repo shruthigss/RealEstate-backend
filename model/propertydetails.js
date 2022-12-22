@@ -22,7 +22,7 @@ const propertyDetailsSchema = new mongoose.Schema({
     },
     Property_age:{
         type:String,
-        required:true
+        required:"Number of years"
     },
     Property_Approved:{
         type:String,
@@ -53,11 +53,11 @@ const propertyDetailsSchema = new mongoose.Schema({
     },
     No_of_BHK:{
         type:Number,
-        required:true
+        required:"Number of Rooms"
     },
     No_of_floor:{
         type:Number,
-        required:true
+        required:"Number of floors"
     },
     Attached:{
         type:String,
@@ -86,11 +86,11 @@ const propertyDetailsSchema = new mongoose.Schema({
     }, 
     Facing:{
         type:String,
-        required:true
+        required:"North, South, East, West"
     },
     Name:{
         type:String,
-        required:true
+        required:"Property Owned By"
     },
     Mobile:{
         type:Number,
@@ -122,8 +122,7 @@ const propertyDetailsSchema = new mongoose.Schema({
     },
     Email:{
         type:String,
-        required:true,
-        unique:true
+        required:true
     },
     City:{
         type:String,
@@ -149,6 +148,12 @@ const propertyDetailsSchema = new mongoose.Schema({
     },
     Longitude:{
         type:String
+    },
+    PPD_ID:{
+        type:String
+    },
+    Days_left:{
+        type:Number
     }
 })
 

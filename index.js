@@ -17,16 +17,12 @@ app.use(express.urlencoded({
     extended: true
 }));
 
-app.use(bodyParser.urlencoded({extended:false}));
+app.use(bodyParser.urlencoded({ extended: false }));
 
-process.on('unhandledRejection', error => {
-    console.log('unhandledRejection', error.message);
-  });
 
-  
 //connection to db
 mongoose.set('strictQuery', true);
-    mongoose.connect(process.env.DATABASE_CONNECTION,{useUnifiedTopology: true,useNewUrlParser: true},
-    ()=>console.log("connected to db"))
+mongoose.connect(process.env.DATABASE_CONNECTION, { useUnifiedTopology: true, useNewUrlParser: true },
+    () => console.log("connected to db"))
 
-app.listen(port, ()=>{console.log(`listening on port number ${port}`)});
+app.listen(port, () => { console.log(`listening on port number ${port}`) });

@@ -6,9 +6,8 @@ const cloudinary = require("cloudinary").v2;
 const upload = require("./multer");
 const path = require("path");
 const jwt = require("jsonwebtoken");
-const secret = "RESTAPIAUTH";
-const bodyParser = require("body-parser");
-const PropetyDetails = require("./model/propertydetails");
+const JWT_SECRET = "abcdefghi"
+const bcrypt = require("bcryptjs")
 
 router.use(express.json());
 
@@ -19,19 +18,37 @@ cloudinary.config({
 });
 
 router.post('/signup', (req, res) => {
-    const signupUser = new signup({
-        email: req.body.email,
-        password: req.body.password,
-        confirmpassword: req.body.confirmpassword
-    })
-    if (password !== confirmpassword) {
-        res.send({
-            message: "Password not matching with confirm password"
+    const { email, password } = req.body;
+    if (!email || !password) {
+        return res.status(422).json({
+            error: "please add all the fields"
         })
     }
-    signupUser.save()
-        .then((data) => {
-            res.json(data)
+
+    signup.findOne({ email: email })
+        .then((savedUser) => {
+            if (savedUser) {
+                return res.status(422).json({
+                    error: "user already exists with that email"
+                })
+            }
+            bcrypt.hash(password, 12).then((hashedpassword) => {
+                const user = new signup({
+                    email,
+                    password: hashedpassword
+
+                })
+                user.save()
+                    .then((user) => {
+                        res.json({
+                            message: "saved successfully"
+                        })
+                    })
+                    .catch((err) => {
+                        console.log(err)
+                    })
+            })
+
         })
         .catch((err) => {
             console.log(err)
@@ -39,42 +56,32 @@ router.post('/signup', (req, res) => {
 })
 
 
-router.post("/signin", async (req, res) => {
-    try {
-        const { email, password } = req.body;
-        let login = await signup.find({ email, password });
-        if (!login) {
-            return res.status(409).json({
-                status: "Failure",
-                message: "No Account Exist"
-            })
-        }
-        //if user already there compare the password
-        if (login) {
-            // Create a token after login 
-            const token = jwt.sign({
-                exp: Math.floor(Date.now() / 1000) + (60 * 60),
-                data: login._id
-            }, secret);
-
-            return res.json({
-                status: "Success",
-                message: "Login Succesful",
-                token
-            })
-        } else {
-            return res.status(401).json({
-                status: "Failed",
-                message: "Invalid credentials"
-            })
-        }
-    }
-    catch (e) {
-        res.json({
-            status: "Failed",
-            message: e.message
+router.post('/signin', (req, res) => {
+    const { email, password } = req.body
+    if (!email || !password) {
+        return res.status(422).json({
+            error: "please add email or password"
         })
     }
+    signup.findOne({ email: email }).then(savedUser => {
+        if (!savedUser) {
+            return res.status(422).json({ error: "Invalid Email or password" })
+        }
+        bcrypt.compare(password, savedUser.password)
+            .then(doMatch => {
+                if (doMatch) {
+                    //res.json({message:"successfully signed in"})
+                    const token = jwt.sign({ _id: savedUser._id }, JWT_SECRET)
+                    const { _id, email } = savedUser
+                    res.json({ token, user: { _id, email } })
+                } else {
+                    return res.status(422).json({ error: "Invalid  password" })
+                }
+            })
+            .catch(err => {
+                console.log(err)
+            })
+    })
 })
 
 
@@ -122,7 +129,9 @@ router.post('/propertydetails', upload.single("image"), async (req, res) => {
             Latitude: req.body.Latitude,
             Longitude: req.body.Longitude,
             images: result.secure_url,
-            cloudinary_id: result.public_id
+            cloudinary_id: result.public_id,
+            PPD_ID: "PPD"+Math.floor(Math.random()*10000),
+            Days_left: Math.floor(Math.random()*100)
         }));
 
         res.json({
@@ -138,41 +147,21 @@ router.post('/propertydetails', upload.single("image"), async (req, res) => {
 });
 
 router.get("/propertydetails", async (req, res) => {
-    try{
-        const Details = await PropetyDetails.find();
+    try {
+        const Details = await propertyDetails.find();
         res.json({
-            status:"sucess",
+            status: "sucess",
             Details
         })
     }
-    catch(err){
+    catch (err) {
         res.status(400).json({
-            status:"Failure",
-            message:e.message
+            status: "Failure",
+            message: err.message
         })
     }
 })
 
 module.exports = router
 
-
-
-
-
-
-
-
-
-
-
-// try{
-//     let signinuser = await signup.findById(req.params.id);
-//             if(!signinuser)
-//                 res.status(400).send({
-//                     message: "User not Exist SingUp"
-//                 });
-//             res.status(200).send
-// }
-// catch(err){
-//     console.log(err)
-// }
+//palaparthisatyanarayana.iit@gmail.com
