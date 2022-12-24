@@ -5,7 +5,7 @@ const app=express();
 app.use(express.json());
 app.use(cors());
 dotevn.config({path : "../.env"});
-const port=process.env.PORT;
+const port=5000;
 require('./database/connection');
 const logRouter = require("./routers/log-reg")
 const form=require("./routers/form");
